@@ -1,0 +1,30 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 每天 UTC 02:00 执行
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream
+        run: |
+          git remote add upstream https://github.com/morluto/rea.git
+          git fetch upstream main
+
+      - name: Sync main branch
+        run: |
+          git checkout main
+          git reset --hard upstream/main
+          git push origin main --force-with-lease
